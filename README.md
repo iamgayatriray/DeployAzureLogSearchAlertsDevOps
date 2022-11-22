@@ -2,7 +2,7 @@
 ## Step 1
 ### Architecture
 - When you want to deploy Alerts into Azure, you might want to take a centralized approach so that management of the monitoring resources is easy plues you adhere to the https://learn.microsoft.com/en-us/azure/architecture/framework/devops/principles
-- Keeping this in mind the pipeline and the ARM template is designed to input only required parameter.
+- Keeping this in mind the pipeline and the ARM template is designed to input only necessary parameter.
 ![image](https://user-images.githubusercontent.com/118750597/203406927-afde7e20-d74c-41e8-81fd-c2fa0688a76b.png)
 - As outlined in the design above, the alerts, action groups and log analytics all remain in the same resource group.
 ### Step 2
