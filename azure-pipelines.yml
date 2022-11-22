@@ -23,5 +23,5 @@ stages:
                 inputs:
                   azureSubscription: 'myalerttest'
                   ScriptType: 'InlineScript'
-                  Inline: 'New-AzResourceGroupDeployment -ResourceGroupName mytest -TemplateFile $(Build.Repository.LocalPath)\DeployLogSearchAlerts.json -TemplateParameterFile $(Build.Repository.LocalPath)\parameters.json'
+                  Inline: 'New-AzResourceGroupDeployment -ResourceGroupName <ProvideResourceGroupName> -TemplateFile $(Build.Repository.LocalPath)\<Providearmtemplatefilename> -TemplateParameterFile $(Build.Repository.LocalPath)\<provideparameterfilename>'
                   azurePowerShellVersion: 'LatestVersion'
