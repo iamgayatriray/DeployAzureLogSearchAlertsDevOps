@@ -1,0 +1,27 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: Stage1
+    jobs:
+    - deployment: 'alertrun'
+      environment: 'alertrun'
+      strategy:
+          runOnce:
+            deploy:
+              steps:
+              - checkout: self
+              - task: AzurePowerShell@5
+                inputs:
+                  azureSubscription: 'myalerttest'
+                  ScriptType: 'InlineScript'
+                  Inline: 'New-AzResourceGroupDeployment -ResourceGroupName <ProvideResourceGroupName> -TemplateFile $(Build.Repository.LocalPath)\<Providearmtemplatefilename> -TemplateParameterFile $(Build.Repository.LocalPath)\<provideparameterfilename>'
+                  azurePowerShellVersion: 'LatestVersion'
