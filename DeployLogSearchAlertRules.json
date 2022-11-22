@@ -1,0 +1,106 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "WorkspaceName": {
+            "type": "string"
+        },
+        "WorkspaceLocation": {
+            "type": "string"
+        },
+        "alertVersion": {
+            "type": "string"
+        },
+        "actionGroupName": {
+            "type": "string"
+        }
+                 },
+    "variables": {
+        "alertlist": [
+            {
+                "AlertName": "This is a Sample Test Alert",
+                "Alertdescription": "Implement Azure Alerts",
+                "AlertSeverity": "1",
+                "Query": "AppEvents| where Name == 'MonitoringAndAlerting'| extend actualerrorcode = parse_json(Properties)['ErrorCode']| where actualerrorcode == 55049",
+                "ThresholdValue": 0,
+                "ThresholdOperator": "GreaterThan",
+                "scheduleIntervalInMinutes": 5,
+                "scheduleQueryTimeSpan": 5,
+                "actionGroupName": "[parameters('actionGroupName')]"
+            },
+            {
+                "AlertName": "App - This is a Sample Test Alert",
+                "Alertdescription": "Implement Azure Alerts",
+                "AlertSeverity": "1",
+                "Query": "AppEvents| where Name == 'MonitoringAndAlerting'| extend actualerrorcode = parse_json(Properties)['ErrorCode']| where actualerrorcode == 55068",
+                "ThresholdValue": 0,
+                "ThresholdOperator": "GreaterThan",
+                "scheduleIntervalInMinutes": 5,
+                "scheduleQueryTimeSpan": 5,
+                "actionGroupName": "[parameters('actionGroupName')]"
+            }
+            
+        ]
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Insights/scheduledQueryRules",
+            "apiVersion": "2018-04-16",
+            "name": "[variables('alertlist')[CopyIndex()].AlertName]",
+            "copy": {
+                "name": "RuleCopy",
+                "count": "[length(variables('alertlist'))]"
+            },
+            "location": "[parameters('WorkspaceLocation')]",
+            "tags": {},
+            "properties": {
+                "description": "[concat('Version:', parameters('alertVersion'), ' ', variables('alertlist')[copyIndex()].Alertdescription)]",
+                "enabled": "true",
+                "source": {
+                    "query": "[concat(variables('alertlist')[copyIndex()].Query)]",
+                    "dataSourceId": "[parameters('WorkspaceName')]",
+                    "queryType": "ResultCount"
+                },
+                "schedule": {
+                    "frequencyInMinutes": "[variables('alertlist')[copyIndex()].scheduleIntervalInMinutes]",
+                    "timeWindowInMinutes": "[variables('alertlist')[copyIndex()].scheduleQueryTimeSpan]"
+                },
+                "severity": "[variables('alertlist')[copyIndex()].AlertSeverity]",
+                "scopes": [
+                    "[parameters('WorkspaceName')]"
+                ],
+                "targetResourceTypes": [
+                    "Microsoft.OperationalInsights/workspaces"
+                ],
+                "windowSize": "[variables('alertlist')[copyIndex()].scheduleQueryTimeSpan]",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "query": "[variables('alertlist')[CopyIndex()].Query]",
+                            "timeAggregation": "Count",
+                            "dimensions": [],
+                            "Operator": "[variables('alertlist')[CopyIndex()].ThresholdOperator]",
+                            "Value": "[variables('alertlist')[CopyIndex()].ThresholdValue]",
+                            "failingPeriods": {
+                                "numberOfEvaluationPeriods": 5,
+                                "minFailingPeriodsToAlert": 1
+                            }
+                        }
+                    ]
+                },
+                "autoMitigate": false,
+                "action": {
+                    "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction",
+                    "severity": "[variables('alertlist')[copyIndex()].AlertSeverity]",
+                    "aznsAction": {
+                        "actionGroup": "[array(resourceId('Microsoft.Insights/actionGroups', variables('alertlist')[copyIndex()].actionGroupName))]"
+                    },
+                    "trigger": {
+                        "thresholdOperator": "[variables('alertlist')[copyIndex()].ThresholdOperator]",
+                        "threshold": "[variables('alertlist')[copyIndex()].ThresholdValue]"
+                    }
+                }
+            }
+        }
+    ]
+}
