@@ -8,7 +8,7 @@ Keeping this in mind the pipeline and the ARM template is designed to input only
 ##### As outlined in the design above, the alerts, action groups and log analytics all remain in the same resource group.
 ### Step 2
 #### Download the 3 files from the repo.
-- DeployLogSearchAlert.Json: The ARM template to deploy multiple alert rules in a client environment
+- DeployLogSearchAlertRules.Json: The ARM template to deploy multiple alert rules in a client environment
 - Parameter.Json: Passes the parameters unique to your environment
 - azure-pipelines.yml: Provides you the instruction of running a devops pipeline to run these 2 json files
 ### Step 3
